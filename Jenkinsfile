@@ -66,14 +66,30 @@ pipeline {
         stage('Verify') {
             steps {
                 sh '''
-                    kubectl get pods -o wide
-                    kubectl get deployment upiwhere-app
-                    kubectl get svc upiwhere-svc
-                    kubectl port-forward svc/upiwhere-svc 18081:80 > /tmp/pf.log 2>&1 &
-                    PF=$!
-                    trap 'kill $PF' EXIT
-                    sleep 6
-                    curl -sf http://localhost:18081/ | head -n 5
+                kubectl get pods -o wide
+                kubectl get deployment upiwhere-app
+                kubectl get svc upiwhere-svc
+                kubectl port-forward svc/upiwhere-svc 18081:80 > /tmp/pf.log 2>&1 &
+                PF=$!
+                trap 'kill $PF' EXIT
+                sleep 6
+                curl -sf http://localhost:18081/ | head -n 5
+                '''
+            }
+        }
+        
+        stage('Scale Deployment') {
+            steps {
+                sh '''
+                echo "Scaling upiwhere-app deployment to 4 replicas..."
+                kubectl scale deployment upiwhere-app --replicas=4
+                
+                echo "Waiting for the new pods to roll out..."
+                kubectl rollout status deployment/upiwhere-app --timeout=180s
+                
+                echo "Verifying scaled pod count:"
+                kubectl get pods -o wide
+                kubectl get deployment upiwhere-app
                 '''
             }
         }
