@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION     = 'ap-south-1'
-        AWS_ACCOUNT_ID = 'YOUR_ACCOUNT_ID'
+        AWS_ACCOUNT_ID = '082706807472'
         ECR_REPO       = 'upiwhere'
         REGISTRY       = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         IMAGE_TAG      = "v${BUILD_NUMBER}"
